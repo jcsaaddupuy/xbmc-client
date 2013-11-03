@@ -1,0 +1,2 @@
+include README.md version.py
+recursive-include src/periscope_daemon/config *.conf
