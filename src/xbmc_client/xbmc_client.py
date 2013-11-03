@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import os
 from optparse import OptionParser, OptionValueError
 import ConfigParser
 
@@ -8,17 +9,42 @@ from xbmcjson import XBMC, PLAYER_VIDEO
 class XbmcClient(object):
   def __init__(self, options):
     self.options=options
+    self.config = ConfigParser.SafeConfigParser()
+    self.initializeConfig()
     self.initializeXbmc()
+
+  def initializeConfig(self):
+    if self.options.config is not None:
+      if os.path.exists(self.options.config):
+        self.config.read(self.options.config)
+      else:
+        raise Exception("The file '%s' does not exists"%(self.options.config))
+    else:
+        self.config.read(self.getDefaultConfig())
+
+
+  def getDefaultConfig(self):
+    cfgfile=None
+    try:
+      import xdg.BaseDirectory as bd
+      cfgfile= os.path.join(bd.xdg_config_home, "xbmc-client","config")
+    except:
+      home = os.path.expanduser("~")
+      if home == "~":
+        log.error("Could not get default configuration path location using XDG (freedesktop).")
+        exit(2)
+      cfgfile= os.path.join(home, ".config", "xbmc-client", "config")
+    return cfgfile
 
   def initializeXbmc(self):
     host=self.getHost()
     user=self.getUser()
     password=self.getPassword()
-    print host, user, password
-    if host is not None:
-      self.xbmc=XBMC(self.getJsonRpc(host), user, password)
-    else:
-      print "No host found"
+    if host is None or host=="":
+      raise Exception("No host found. Have you configured the default config file %s ?"%(self.getDefaultConfig()))
+    if user is None or user=="":
+      raise Exception("No user found. Have you configured the default config file %s ?"%(self.getDefaultConfig()))
+    self.xbmc=XBMC(self.getJsonRpc(host), user, password)
 
   def getJsonRpc(self, host):
     jsonrpc="jsonrpc"
@@ -27,14 +53,19 @@ class XbmcClient(object):
     return host+jsonrpc
 
   def getHost(self):
+    #Command line always override config
     if self.options.host is not None:
       return self.options.host
+    return self.config.get("xbmc","host")
   def getUser(self):
+    #Command line always override config
     if self.options.user is not None:
       return self.options.user
+    return self.config.get("xbmc","user")
   def getPassword(self):
     if self.options.password is not None:
       return self.options.password
+    return self.config.get("xbmc","password")
 
   def openWindow(self, windowname):
     return self.xbmc.GUI.ActivateWindow(window=windowname)
@@ -91,7 +122,6 @@ class XbmcClient(object):
         res = self.xbmc.AudioLibrary.Clean()
       else:
         print "Unsupported library type : '%s'"%(self.options.clean)
-    print res
     if res is not None:
       success=False
       if res.has_key("result") and (res["result"]=="OK" or res["result"]==True):
@@ -106,6 +136,7 @@ class XbmcClient(object):
       else:
         print "Unknown error : '%s'"%(res)
       if success:
+        print "Success."
         exit(0)
     exit(-1)
 
@@ -125,6 +156,9 @@ def main():
 
 
   parser = OptionParser("usage: %prog [options]")
+  # Config options
+  parser.add_option("-c","--config", action="store", type="string", dest="config", help="Configuration file. Default is located in ~/.config/xbmc-client/config")
+
   # XBMC instance options
   parser.add_option("--host", action="store", type="string", dest="host", help="XBMC http host")
   parser.add_option("--user", action="store", type="string", dest="user", help="XBMC http user")
@@ -170,8 +204,6 @@ def main():
   parser.add_option("--clean", action="store", type="string", dest="clean", help="Clean the given library by default. Set it to 'audio' or 'video'")
 
   (options, args) = parser.parse_args()
-  print options
-  print args
 
   p = XbmcClient(options)
   p.execute()
