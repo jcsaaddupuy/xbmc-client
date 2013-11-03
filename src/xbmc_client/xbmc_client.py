@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 
 from optparse import OptionParser, OptionValueError
 import ConfigParser
@@ -37,7 +37,7 @@ class XbmcClient(object):
       return self.options.password
 
   def openWindow(self, windowname):
-    return self.xbmc.GUI.ActivateWindow({"window":windowname})
+    return self.xbmc.GUI.ActivateWindow(window=windowname)
 
   def execute(self):
     res = None
@@ -46,13 +46,13 @@ class XbmcClient(object):
     if self.options.stop:
       res = self.xbmc.Player.Stop([PLAYER_VIDEO])
     if self.options.notify:
-      title="Notification title"
-      message="Notification message"
+      _title="Notification title"
+      _message="Notification message"
       if self.options.notify_title is not None:
-        title=self.options.notify_title
+        _title=self.options.notify_title
       if self.options.notify_message is not None:
-        message=self.options.notify_message
-      res = self.xbmc.GUI.ShowNotification({"title":title, "message":message})
+        _message=self.options.notify_message
+      res = self.xbmc.GUI.ShowNotification(title=_title, message=_message)
     if self.options.left:
       res = self.xbmc.Input.Left()
     if self.options.right:
@@ -66,7 +66,11 @@ class XbmcClient(object):
     if self.options.info:
       res = self.xbmc.Input.Info()
     if self.options.sendtext is not None:
-      res= self.xbmc.Input.SendText({"text": self.options.sendtext})
+      res= self.xbmc.Input.SendText(text = self.options.sendtext)
+    if self.options.mute:
+      res = self.xbmc.Application.SetMute(mute=True)
+    if self.options.unmute:
+      res = self.xbmc.Application.SetMute(mute=False)
     if self.options.window is not None:
       res = self.openWindow(self.options.window)
     print res
@@ -104,6 +108,11 @@ def main():
   parser.add_option("-p","--playpause", action="store_true", dest="playpause", help="Plays or pauses playback")
   parser.add_option("-s","--stop", action="store_true", dest="stop", help="Stops playback")
 
+  # Volume options
+  parser.add_option("--mute", action="store_true", dest="mute", help="Mute")
+  parser.add_option("--unmute", action="store_true", dest="unmute", help="Unmute")
+
+
   # Notifications options
   parser.add_option("-n","--notify", action="store_true", dest="notify", help="Sends a notification")
   parser.add_option("-t","--title", action="store", type="string", dest="notify_title", help="Notification title")
@@ -125,6 +134,7 @@ def main():
   parser.add_option("--weather", action="callback", dest="weather", help="Open the Weather window", callback=customWindow)
   parser.add_option("--settings", action="callback", dest="settings", help="Open the Settings window", callback=customWindow)
   parser.add_option("--videos", action="callback", dest="videos", help="Open the Videos window", callback=customWindow)
+
 
   (options, args) = parser.parse_args()
   print options
