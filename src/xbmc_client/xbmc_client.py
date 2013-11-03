@@ -41,6 +41,8 @@ class XbmcClient(object):
 
   def execute(self):
     res = None
+    if self.options.ping:
+      res = self.xbmc.JSONRPC.Ping()
     if self.options.playpause:
       res = self.xbmc.Player.PlayPause([PLAYER_VIDEO])
     if self.options.stop:
@@ -65,6 +67,8 @@ class XbmcClient(object):
       res = self.xbmc.Input.Back()
     if self.options.info:
       res = self.xbmc.Input.Info()
+    if self.options.select:
+      res = self.xbmc.Input.Select()
     if self.options.sendtext is not None:
       res= self.xbmc.Input.SendText(text = self.options.sendtext)
     if self.options.mute:
@@ -86,15 +90,23 @@ class XbmcClient(object):
       elif self.options.clean == "music":
         res = self.xbmc.AudioLibrary.Clean()
       else:
-        print "Unsupported library type : '%s'"%(self.options.scan)
+        print "Unsupported library type : '%s'"%(self.options.clean)
     print res
     if res is not None:
-        if res.has_key("result") and res["result"]=="OK":
-          exit(0)
-        elif res.has_key("error") and res["error"].has_key("message"):
-          print res["error"]["message"]
-        else:
-          print "Unknown error"
+      success=False
+      if res.has_key("result") and (res["result"]=="OK" or res["result"]==True):
+        success=True
+      elif res.has_key("result") and res["result"]=="pong":
+        success=True
+      elif res.has_key("result") and res["result"]==False and self.options.unmute:
+        # unmute always send me a result == False, even when it"s ok...
+        success=True
+      elif res.has_key("error") and res["error"].has_key("message"):
+        print res["error"]["message"]
+      else:
+        print "Unknown error : '%s'"%(res)
+      if success:
+        exit(0)
     exit(-1)
 
 
@@ -118,6 +130,9 @@ def main():
   parser.add_option("--user", action="store", type="string", dest="user", help="XBMC http user")
   parser.add_option("--password", action="store", type="string", dest="password", help="XBMC http password")
 
+  # JSONRPC options
+  parser.add_option("--ping", action="store_true", dest="ping", help="Send a ping")
+  
   # Playback options
   parser.add_option("-p","--playpause", action="store_true", dest="playpause", help="Plays or pauses playback")
   parser.add_option("-s","--stop", action="store_true", dest="stop", help="Stops playback")
@@ -139,6 +154,7 @@ def main():
   parser.add_option("--down", action="store_true", dest="down", help="Send 'Down' key")
   parser.add_option("--back", action="store_true", dest="back", help="Send 'Back' key")
   parser.add_option("--info", action="store_true", dest="info", help="Send 'Info' key")
+  parser.add_option("--select", action="store_true", dest="select", help="Send 'Select' key")
   parser.add_option("--sendtext", action="store", type="string", dest="sendtext", help="Send a custom text input")
 
   # Window options
