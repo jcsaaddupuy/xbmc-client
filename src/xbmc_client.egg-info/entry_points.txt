@@ -1,0 +1,3 @@
+[console_scripts]
+xbmc-client = xbmc_client:main
+
