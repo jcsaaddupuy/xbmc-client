@@ -36,6 +36,9 @@ class XbmcClient(object):
     if self.options.password is not None:
       return self.options.password
 
+  def openWindow(self, windowname):
+    return self.xbmc.GUI.ActivateWindow({"window":windowname})
+
   def execute(self):
     res = None
     if self.options.playpause:
@@ -64,6 +67,8 @@ class XbmcClient(object):
       res = self.xbmc.Input.Info()
     if self.options.sendtext is not None:
       res= self.xbmc.Input.SendText({"text": self.options.sendtext})
+    if self.options.window is not None:
+      res = self.openWindow(self.options.window)
     print res
     if res is not None:
         if res.has_key("result") and res["result"]=="OK":
@@ -76,6 +81,18 @@ class XbmcClient(object):
 
 
 def main():
+  def customWindow(option, opt, value, parser):
+    """Open custom window"""
+    # define here the mapping between the parametre and the associated window
+    WINWOWS={
+        '--home' : 'home',
+        '--weather' : 'weather',
+        '--settings' : 'settings',
+        '--videos' : 'videos',
+        }
+    if WINWOWS.has_key(opt):
+      parser.values.window=WINWOWS[opt]
+
 
   parser = OptionParser("usage: %prog [options]")
   # XBMC instance options
@@ -102,6 +119,12 @@ def main():
   parser.add_option("--sendtext", action="store", type="string", dest="sendtext", help="Send a custom text input")
 
   # Window options
+  parser.add_option("--window", action="store", type="string", dest="window", help="Open a custom window")
+  # Specifics windows are managed by the callback
+  parser.add_option("--home", action="callback", dest="home", help="Open the Home window", callback=customWindow)
+  parser.add_option("--weather", action="callback", dest="weather", help="Open the Weather window", callback=customWindow)
+  parser.add_option("--settings", action="callback", dest="settings", help="Open the Settings window", callback=customWindow)
+  parser.add_option("--videos", action="callback", dest="videos", help="Open the Videos window", callback=customWindow)
 
   (options, args) = parser.parse_args()
   print options
