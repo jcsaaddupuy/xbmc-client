@@ -73,6 +73,20 @@ class XbmcClient(object):
       res = self.xbmc.Application.SetMute(mute=False)
     if self.options.window is not None:
       res = self.openWindow(self.options.window)
+    if self.options.scan is not None:
+      if self.options.scan == "video":
+        res = self.xbmc.VideoLibrary.Scan()
+      elif self.options.scan == "music":
+        res = self.xbmc.AudioLibrary.Scan()
+      else:
+        print "Unsupported library type : '%s'"%(self.options.scan)
+    if self.options.clean is not None:
+      if self.options.clean == "video":
+        res = self.xbmc.VideoLibrary.Clean()
+      elif self.options.clean == "music":
+        res = self.xbmc.AudioLibrary.Clean()
+      else:
+        print "Unsupported library type : '%s'"%(self.options.scan)
     print res
     if res is not None:
         if res.has_key("result") and res["result"]=="OK":
@@ -135,6 +149,9 @@ def main():
   parser.add_option("--settings", action="callback", dest="settings", help="Open the Settings window", callback=customWindow)
   parser.add_option("--videos", action="callback", dest="videos", help="Open the Videos window", callback=customWindow)
 
+  # Library options
+  parser.add_option("--scan", action="store", type="string", dest="scan", help="Scan the video library by default. Set it to 'audio' or 'video'")
+  parser.add_option("--clean", action="store", type="string", dest="clean", help="Clean the given library by default. Set it to 'audio' or 'video'")
 
   (options, args) = parser.parse_args()
   print options
