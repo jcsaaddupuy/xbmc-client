@@ -117,6 +117,8 @@ class XbmcClient(object):
       res = self.xbmc.Input.Select()
     if self.options.sendtext is not None:
       res= self.xbmc.Input.SendText(text = self.options.sendtext)
+    if self.options.volume:
+      res = self.xbmc.Application.SetVolume(volume=self.options.volume)
     if self.options.mute:
       res = self.xbmc.Application.SetMute(mute=True)
     if self.options.unmute:
@@ -141,6 +143,10 @@ class XbmcClient(object):
       success=False
       if res.has_key("result") and (res["result"]=="OK" or res["result"]==True):
         success=True
+      # Application.SetVolume returns an integer
+      if self.options.volume is not None and res.has_key("result") and (type(res["result"]) == int):
+        success=True
+      # JSONRPC.Ping() returns the string 'pong'
       elif res.has_key("result") and res["result"]=="pong":
         success=True
       elif res.has_key("result") and res["result"]==False and self.options.unmute:
@@ -189,6 +195,7 @@ def main():
   # Volume options
   parser.add_option("--mute", action="store_true", dest="mute", help="Mute")
   parser.add_option("--unmute", action="store_true", dest="unmute", help="Unmute")
+  parser.add_option("--volume", action="store", type="int", dest="volume", help="Set the volume to the given value")
 
 
   # Notifications options
