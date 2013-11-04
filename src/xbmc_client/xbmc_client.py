@@ -125,6 +125,8 @@ class XbmcClient(object):
       res = self.xbmc.Application.SetMute(mute=False)
     if self.options.window is not None:
       res = self.openWindow(self.options.window)
+    if self.options.addon_id is not None:
+      res = self.xbmc.Addons.ExecuteAddon(addonid=self.options.addon_id)
     if self.options.scan is not None:
       if self.options.scan == "video":
         res = self.xbmc.VideoLibrary.Scan()
@@ -228,6 +230,8 @@ def main():
   parser.add_option("--scan", action="store", type="string", dest="scan", help="Scan the given library. Set it to 'audio' or 'video'")
   parser.add_option("--clean", action="store", type="string", dest="clean", help="Clean the given library. Set it to 'audio' or 'video'")
 
+  # Addons options
+  parser.add_option("--addon", action="store", type="string", dest="addon_id", help="Execute the given addon. Parameters not yet supporteds.")
   (options, args) = parser.parse_args()
 
   p = XbmcClient(options)
