@@ -3,6 +3,7 @@
 import os
 from optparse import OptionParser, OptionValueError
 import ConfigParser
+import shutil
 
 from xbmcjson import XBMC, PLAYER_VIDEO
 
@@ -20,21 +21,35 @@ class XbmcClient(object):
       else:
         raise Exception("The file '%s' does not exists"%(self.options.config))
     else:
-        self.config.read(self.getDefaultConfig())
+      if not os.path.exists(self.getDefaultConfig()):
+        self.installDefaultConfig()
+      self.config.read(self.getDefaultConfig())
+  
+  def installDefaultConfig(self):
+    cfgFolder=self.getConfigFolder()
+    cfgFile=self.getDefaultConfig()
+    if not os.path.exists(cfgFolder):
+      os.makedirs(cfgFolder)
+    if not os.path.exists(cfgFile):
+      dist_config = os.path.join(os.path.dirname(__file__), 'config', 'config')
+      shutil.copy(dist_config, cfgFolder)
 
 
-  def getDefaultConfig(self):
-    cfgfile=None
+  def getConfigFolder(self):
+    cfgfolder=None
     try:
       import xdg.BaseDirectory as bd
-      cfgfile= os.path.join(bd.xdg_config_home, "xbmc-client","config")
+      cfgfolder= os.path.join(bd.xdg_config_home, "xbmc-client")
     except:
       home = os.path.expanduser("~")
       if home == "~":
         log.error("Could not get default configuration path location using XDG (freedesktop).")
         exit(2)
-      cfgfile= os.path.join(home, ".config", "xbmc-client", "config")
-    return cfgfile
+      cfgfolder = os.path.join(home, ".config", "xbmc-client")
+    return cfgfolder
+
+  def getDefaultConfig(self):
+    return os.path.join(self.getConfigFolder(), "config")
 
   def initializeXbmc(self):
     host=self.getHost()
@@ -200,8 +215,8 @@ def main():
   parser.add_option("--videos", action="callback", dest="videos", help="Open the Videos window", callback=customWindow)
 
   # Library options
-  parser.add_option("--scan", action="store", type="string", dest="scan", help="Scan the video library by default. Set it to 'audio' or 'video'")
-  parser.add_option("--clean", action="store", type="string", dest="clean", help="Clean the given library by default. Set it to 'audio' or 'video'")
+  parser.add_option("--scan", action="store", type="string", dest="scan", help="Scan the given library. Set it to 'audio' or 'video'")
+  parser.add_option("--clean", action="store", type="string", dest="clean", help="Clean the given library. Set it to 'audio' or 'video'")
 
   (options, args) = parser.parse_args()
 
