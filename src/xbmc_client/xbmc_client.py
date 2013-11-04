@@ -175,9 +175,9 @@ def main():
   parser.add_option("-c","--config", action="store", type="string", dest="config", help="Configuration file. Default is located in ~/.config/xbmc-client/config")
 
   # XBMC instance options
-  parser.add_option("--host", action="store", type="string", dest="host", help="XBMC http host")
-  parser.add_option("--user", action="store", type="string", dest="user", help="XBMC http user")
-  parser.add_option("--password", action="store", type="string", dest="password", help="XBMC http password")
+  parser.add_option("--host", action="store", type="string", dest="host", help="XBMC http host. Will override configuration.")
+  parser.add_option("--user", action="store", type="string", dest="user", help="XBMC http user. Will override the configuration.")
+  parser.add_option("--password", action="store", type="string", dest="password", help="XBMC http password. Will override the configuration.")
 
   # JSONRPC options
   parser.add_option("--ping", action="store_true", dest="ping", help="Send a ping")
