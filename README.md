@@ -3,6 +3,9 @@ xbmc-client
 
 xbmc-client is a XBMC command line client which control your XBMC instance throught JSON API.
 
+```sh
+pip install xbmc-client
+```
 
 Available options :
 
