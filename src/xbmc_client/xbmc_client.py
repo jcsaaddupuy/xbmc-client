@@ -149,6 +149,8 @@ class XbmcClient(object):
       # JSONRPC.Ping() returns the string 'pong'
       elif res.has_key("result") and res["result"]=="pong":
         success=True
+      elif self.options.playpause and res.has_key("result"):
+        success=True
       elif res.has_key("result") and res["result"]==False and self.options.unmute:
         # unmute always send me a result == False, even when it"s ok...
         success=True
