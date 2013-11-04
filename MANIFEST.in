@@ -1,2 +1,2 @@
 include README.md version.py
-recursive-include src/xbmc-client/config *
+recursive-include src/xbmc_client/config *
