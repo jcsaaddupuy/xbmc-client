@@ -144,11 +144,12 @@ class XbmcClient(object):
       if res.has_key("result") and (res["result"]=="OK" or res["result"]==True):
         success=True
       # Application.SetVolume returns an integer
-      if self.options.volume is not None and res.has_key("result") and (type(res["result"]) == int):
+      elif self.options.volume is not None and res.has_key("result") and (type(res["result"]) == int):
         success=True
       # JSONRPC.Ping() returns the string 'pong'
       elif res.has_key("result") and res["result"]=="pong":
         success=True
+      # PlayPause will return 'result': {u'speed': N} with N as the current the speed
       elif self.options.playpause and res.has_key("result"):
         success=True
       elif res.has_key("result") and res["result"]==False and self.options.unmute:
