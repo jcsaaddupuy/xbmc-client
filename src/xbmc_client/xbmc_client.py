@@ -117,6 +117,8 @@ class XbmcClient(object):
       res = self.xbmc.Input.Select()
     if self.options.sendtext is not None:
       res= self.xbmc.Input.SendText(text = self.options.sendtext)
+    if self.options.url is not None:
+      res= self.xbmc.Player.Open(item={"file": self.options.url})
     if self.options.volume:
       res = self.xbmc.Application.SetVolume(volume=self.options.volume)
     if self.options.mute:
@@ -217,6 +219,7 @@ def main():
   parser.add_option("--info", action="store_true", dest="info", help="Send 'Info' key")
   parser.add_option("--select", action="store_true", dest="select", help="Send 'Select' key")
   parser.add_option("--sendtext", action="store", type="string", dest="sendtext", help="Send a custom text input")
+  parser.add_option("--url", action="store", type="string", dest="url", help="Play a URL")
 
   # Window options
   parser.add_option("--window", action="store", type="string", dest="window", help="Open a custom window")
