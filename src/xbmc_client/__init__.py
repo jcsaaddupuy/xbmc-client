@@ -1,1 +1,1 @@
-from xbmc_client import *
+from .xbmc_client import *
