@@ -20,5 +20,5 @@ setup(name = PACKAGE, version = version.VERSION,
         'xbmc-client = xbmc_client:main',
         ]
       },
-    install_requires = ["xbmc-json >= 0.0.4.dev", ]
+    install_requires = ["xbmc-json >= 0.2.0", ]
     )
