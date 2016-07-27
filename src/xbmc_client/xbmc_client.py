@@ -10,6 +10,7 @@ except ImportError:
     from configparser import SafeConfigParser
 
 import shutil
+import re
 
 from xbmcjson import XBMC, PLAYER_VIDEO
 
@@ -68,10 +69,10 @@ class XbmcClient(object):
             raise Exception(
                 "No host found. Have you configured the default config file %s ?"
                 % (self.getDefaultConfig()))
-        if not user:
-            raise Exception(
-                "No user found. Have you configured the default config file %s ?"
-                % (self.getDefaultConfig()))
+        # if not user:
+        #     raise Exception(
+        #         "No user found. Have you configured the default config file %s ?"
+        #         % (self.getDefaultConfig()))
         self.xbmc = XBMC(self.getJsonRpc(host), user, password)
 
     def getJsonRpc(self, host):
@@ -84,7 +85,8 @@ class XbmcClient(object):
         #Command line always override config
         if self.options.host is not None:
             return self.options.host
-        return self.config.get("xbmc", "host")
+        # incases of 'no user needed' we may have "" as our user
+        return self.config.get("xbmc", "host") or ""
 
     def getUser(self):
         #Command line always override config
@@ -117,6 +119,9 @@ class XbmcClient(object):
                 _message = self.options.notify_message
             res = self.xbmc.GUI.ShowNotification(title=_title,
                                                  message=_message)
+
+        if self.options.youtube_url is not None:
+            self.playYoutubeVideo(self.options.youtube_url)
         if self.options.left:
             res = self.xbmc.Input.Left()
         if self.options.right:
@@ -185,6 +190,16 @@ class XbmcClient(object):
                 print("Success.")
                 exit(0)
         exit(-1)
+
+
+    def playYoutubeVideo(self, url):
+        match = re.match(r'.*youtube.com/watch\?v=(.{11})', url)
+        if match is None:
+            print("Error, could not find valid youtube url.")
+            exit(-1)
+        video_id = match.group(1)
+        self.xbmc.Player.Open(item={"file":
+                                    "plugin://plugin.video.youtube/?action=play_video&videoid=" + video_id})
 
 
 def main():
@@ -317,6 +332,12 @@ def main():
                       type="string",
                       dest="url",
                       help="Play a URL")
+
+    parser.add_option("--youtube",
+                      action="store",
+                      type="string",
+                      dest="youtube_url",
+                      help="Open a youtube url")
 
     # Window options
     parser.add_option("--window",
