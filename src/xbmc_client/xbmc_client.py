@@ -82,14 +82,14 @@ class XbmcClient(object):
         return host + jsonrpc
 
     def getHost(self):
-        #Command line always override config
+        # Command line always override config
         if self.options.host is not None:
             return self.options.host
         # incases of 'no user needed' we may have "" as our user
         return self.config.get("xbmc", "host") or ""
 
     def getUser(self):
-        #Command line always override config
+        # Command line always override config
         if self.options.user is not None:
             return self.options.user
         return self.config.get("xbmc", "user")
@@ -167,7 +167,7 @@ class XbmcClient(object):
         if res is not None:
             success = False
             if "result" in res and (res["result"] == "OK" or
-                                        res["result"] == True):
+                                    res["result"] == True):
                 success = True
             # Application.SetVolume returns an integer
             elif self.options.volume is not None and "result" in res and (type(res["result"]) == int):
@@ -175,11 +175,12 @@ class XbmcClient(object):
             # JSONRPC.Ping() returns the string 'pong'
             elif "result" in res and res["result"] == "pong":
                 success = True
-            # PlayPause will return 'result': {u'speed': N} with N as the current the speed
+            # PlayPause will return 'result': {u'speed': N} with N as the
+            # current the speed
             elif self.options.playpause and "result" in res:
                 success = True
             elif "result" in res and res["result"
-                                   ] == False and self.options.unmute:
+                                         ] == False and self.options.unmute:
                 # unmute always send me a result == False, even when it"s ok...
                 success = True
             elif "error" in res and "message" in res["error"]:
@@ -190,7 +191,6 @@ class XbmcClient(object):
                 print("Success.")
                 exit(0)
         exit(-1)
-
 
     def playYoutubeVideo(self, url):
         match = re.match(r'.*youtube.com/watch\?v=(.{11})', url)
@@ -205,7 +205,8 @@ class XbmcClient(object):
 def main():
     def customWindow(option, opt, value, parser):
         """Open custom window"""
-        # define here the mapping between the parametre and the associated window
+        # define here the mapping between the parametre and the associated
+        # window
         WINWOWS = {
             '--home': 'home',
             '--weather': 'weather',
@@ -223,8 +224,7 @@ def main():
         action="store",
         type="string",
         dest="config",
-        help=
-        "Configuration file. Default is located in ~/.config/xbmc-client/config")
+        help="Configuration file. Default is located in ~/.config/xbmc-client/config")
 
     # XBMC instance options
     parser.add_option("--host",
