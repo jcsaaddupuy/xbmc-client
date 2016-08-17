@@ -27,8 +27,7 @@ class XbmcClient(object):
             if os.path.exists(self.options.config):
                 self.config.read(self.options.config)
             else:
-                raise Exception("The file '%s' does not exists" %
-                                (self.options.config))
+                raise Exception("The file '%s' does not exists" % (self.options.config))
         else:
             if not os.path.exists(self.getDefaultConfig()):
                 self.installDefaultConfig()
@@ -40,8 +39,7 @@ class XbmcClient(object):
         if not os.path.exists(cfgFolder):
             os.makedirs(cfgFolder)
         if not os.path.exists(cfgFile):
-            dist_config = os.path.join(os.path.dirname(__file__), 'config',
-                                       'config')
+            dist_config = os.path.join(os.path.dirname(__file__), 'config', 'config')
             shutil.copy(dist_config, cfgFolder)
 
     def getConfigFolder(self):
