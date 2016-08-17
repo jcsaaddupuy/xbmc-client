@@ -10,7 +10,7 @@ pip install xbmc-client
 Available options :
 
 ```sh
-Usage: xbmc_client.py [options]
+Usage: xbmc-client [options]
 
 Options:
   -h, --help            show this help message and exit
