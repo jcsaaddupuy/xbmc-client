@@ -69,10 +69,10 @@ class XbmcClient(object):
             raise Exception(
                 "No host found. Have you configured the default config file %s ?"
                 % (self.getDefaultConfig()))
-        # if not user:
-        #     raise Exception(
-        #         "No user found. Have you configured the default config file %s ?"
-        #         % (self.getDefaultConfig()))
+        if not user:
+            raise Exception(
+                    "No user found. Have you configured the default config file %s ?"
+                    % (self.getDefaultConfig()))
         self.xbmc = XBMC(self.getJsonRpc(host), user, password)
 
     def getJsonRpc(self, host):
