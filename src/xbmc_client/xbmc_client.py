@@ -50,8 +50,7 @@ class XbmcClient(object):
         except:
             home = os.path.expanduser("~")
             if home == "~":
-                log.error(
-                    "Could not get default configuration path location using XDG (freedesktop).")
+                print("Could not get default configuration path location using XDG (freedesktop).")
                 exit(2)
             cfgfolder = os.path.join(home, ".config", "xbmc-client")
         return cfgfolder
